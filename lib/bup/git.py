@@ -92,7 +92,7 @@ def _local_git_date_str(epoch_sec):
 
 
 def _git_date_str(epoch_sec, tz_offset_sec):
-    offs =  tz_offset_sec / 60
+    offs =  tz_offset_sec // 60
     return '%d %s%02d%02d' \
         % (epoch_sec, '+' if offs >= 0 else '-', abs(offs) / 60, abs(offs) % 60)
 
@@ -909,10 +909,11 @@ def update_ref(refname, newval, oldval, repo_dir=None):
     _git_wait('git update-ref', p)
 
 
-def delete_ref(refname):
-    """Delete a repository reference."""
+def delete_ref(refname, oldvalue=None):
+    """Delete a repository reference (see git update-ref(1))."""
     assert(refname.startswith('refs/'))
-    p = subprocess.Popen(['git', 'update-ref', '-d', refname],
+    oldvalue = [] if not oldvalue else [oldvalue]
+    p = subprocess.Popen(['git', 'update-ref', '-d', refname] + oldvalue,
                          preexec_fn = _gitenv())
     _git_wait('git update-ref', p)
 
