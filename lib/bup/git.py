@@ -563,6 +563,7 @@ class PackWriter:
     """Writes Git objects inside a pack file."""
     def __init__(self, objcache_maker=_make_objcache, compression_level=1):
         self.file = None
+        self.parentfd = None
         self.count = 0
         self.outbytes = 0
         self.filename = None
@@ -576,11 +577,19 @@ class PackWriter:
 
     def _open(self):
         if not self.file:
-            (fd,name) = tempfile.mkstemp(suffix='.pack', dir=repo('objects'))
+            objdir = dir=repo('objects')
+            fd, name = tempfile.mkstemp(suffix='.pack', dir=objdir)
             try:
                 self.file = os.fdopen(fd, 'w+b')
             except:
                 os.close(fd)
+                raise
+            try:
+                self.parentfd = os.open(objdir, os.O_RDONLY)
+            except:
+                f = self.file
+                self.file = None
+                f.close()
                 raise
             assert(name.endswith('.pack'))
             self.filename = name[:-5]
@@ -682,12 +691,18 @@ class PackWriter:
         """Remove the pack file from disk."""
         f = self.file
         if f:
-            self.idx = None
+            pfd = self.parentfd
             self.file = None
+            self.parentfd = None
+            self.idx = None
             try:
-                os.unlink(self.filename + '.pack')
+                try:
+                    os.unlink(self.filename + '.pack')
+                finally:
+                    f.close()
             finally:
-                f.close()
+                if pfd is not None:
+                    os.close(pfd)
 
     def _end(self, run_midx=True):
         f = self.file
@@ -711,6 +726,7 @@ class PackWriter:
                 sum.update(b)
             packbin = sum.digest()
             f.write(packbin)
+            fdatasync(f.fileno())
         finally:
             f.close()
 
@@ -721,6 +737,10 @@ class PackWriter:
             os.unlink(self.filename + '.map')
         os.rename(self.filename + '.pack', nameprefix + '.pack')
         os.rename(self.filename + '.idx', nameprefix + '.idx')
+        try:
+            fdatasync(self.parentfd)
+        finally:
+            os.close(self.parentfd)
 
         if run_midx:
             auto_midx(repo('objects/pack'))
@@ -743,10 +763,12 @@ class PackWriter:
         idx_f = open(filename, 'w+b')
         try:
             idx_f.truncate(index_len)
+            fdatasync(idx_f.fileno())
             idx_map = mmap_readwrite(idx_f, close=False)
             try:
                 count = _helpers.write_idx(filename, idx_map, idx, self.count)
                 assert(count == self.count)
+                idx_map.flush()
             finally:
                 idx_map.close()
         finally:
@@ -769,6 +791,7 @@ class PackWriter:
             for b in chunkyreader(idx_f):
                 idx_sum.update(b)
             idx_f.write(idx_sum.digest())
+            fdatasync(idx_f.fileno())
             return namebase
         finally:
             idx_f.close()
