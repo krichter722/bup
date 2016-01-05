@@ -1,0 +1,9 @@
+[MESSAGES CONTROL]
+disable=all
+enable=trailing-whitespace,indent-string
+
+[MESSAGES]
+trailing-whitespace=
+
+[FORMAT]
+indent-string='    '

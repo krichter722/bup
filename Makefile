@@ -52,7 +52,7 @@ bup_cmds := cmd/bup-python\
 
 bup_deps := bup lib/bup/_version.py lib/bup/_helpers$(SOEXT) $(bup_cmds)
 
-all: $(bup_deps) Documentation/all $(current_sampledata)
+all: $(bup_deps) Documentation/all $(current_sampledata) pylint
 
 bup:
 	ln -s main.py bup
@@ -278,3 +278,6 @@ clean: Documentation/clean cmd/bup-python
 	t/configure-sampledata --clean
         # Remove last so that cleanup tools can depend on it
 	rm -f cmd/bup-* cmd/python-cmd.sh
+
+pylint:
+	pylint --rcfile=pylintrc lib t bup
