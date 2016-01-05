@@ -293,7 +293,7 @@ for (transname,ent) in r.filter(extra, wantrecurse=wantrecurse_during):
     if opt.progress:
         progress_report(0)
     fcount += 1
-    
+
     if not exists:
         continue
     if opt.smaller and ent.size >= opt.smaller:
@@ -455,7 +455,7 @@ if opt.commit or opt.name:
 
 msr.close()
 w.close()  # must close before we can update the ref
-        
+
 if opt.name:
     if cli:
         cli.update_ref(refname, commit, oldref)

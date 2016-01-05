@@ -55,7 +55,7 @@ def report(count):
         start = now
         print fmt % tuple([''] + headers)
     sys.stdout.flush()
-    
+
     # don't include time to run report() in usage counts
     ru = resource.getrusage(resource.RUSAGE_SELF)
     last_u = ru.ru_utime
@@ -92,7 +92,7 @@ if opt.existing:
             for e in mi:
                 yield e
     objit = iter(foreverit(m))
-    
+
 for c in xrange(opt.cycles):
     for n in xrange(opt.number):
         if opt.existing:
@@ -109,15 +109,15 @@ for c in xrange(opt.cycles):
     report((c+1)*opt.number)
 
 if bloom._total_searches:
-    print ('bloom: %d objects searched in %d steps: avg %.3f steps/object' 
+    print ('bloom: %d objects searched in %d steps: avg %.3f steps/object'
            % (bloom._total_searches, bloom._total_steps,
               bloom._total_steps*1.0/bloom._total_searches))
 if midx._total_searches:
-    print ('midx: %d objects searched in %d steps: avg %.3f steps/object' 
+    print ('midx: %d objects searched in %d steps: avg %.3f steps/object'
            % (midx._total_searches, midx._total_steps,
               midx._total_steps*1.0/midx._total_searches))
 if git._total_searches:
-    print ('idx: %d objects searched in %d steps: avg %.3f steps/object' 
+    print ('idx: %d objects searched in %d steps: avg %.3f steps/object'
            % (git._total_searches, git._total_steps,
               git._total_steps*1.0/git._total_searches))
 print 'Total time: %.3fs' % (time.time() - start)

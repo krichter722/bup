@@ -70,7 +70,7 @@ def quick_verify(base):
     if sum.digest() != wantsum:
         raise ValueError('expected %r, got %r' % (wantsum.encode('hex'),
                                                   sum.hexdigest()))
-        
+
 
 def git_verify(base):
     if opt.quick:
@@ -82,8 +82,8 @@ def git_verify(base):
         return 0
     else:
         return run(['git', 'verify-pack', '--', base])
-    
-    
+
+
 def do_pack(base, last, par2_exists):
     code = 0
     if par2_ok and par2_exists and (opt.repair or not opt.generate):
@@ -178,11 +178,11 @@ for name in extra:
     if par2_exists and os.stat(base + '.par2').st_size == 0:
         par2_exists = 0
     sys.stdout.flush()
-    debug('fsck: checking %s (%s)\n' 
+    debug('fsck: checking %s (%s)\n'
           % (last, par2_ok and par2_exists and 'par2' or 'git'))
     if not opt.verbose:
         progress('fsck (%d/%d)\r' % (count, len(extra)))
-    
+
     if not opt.jobs:
         nc = do_pack(base, last, par2_exists)
         code = code or nc
@@ -204,7 +204,7 @@ for name in extra:
             except Exception as e:
                 log('exception: %r\n' % e)
                 sys.exit(99)
-                
+
 while len(outstanding):
     (pid,nc) = os.wait()
     nc >>= 8

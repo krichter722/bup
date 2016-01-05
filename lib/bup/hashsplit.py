@@ -28,10 +28,10 @@ class Buf:
         if s:
             self.data = buffer(self.data, self.start) + s
             self.start = 0
-            
+
     def peek(self, count):
         return buffer(self.data, self.start, count)
-    
+
     def eat(self, count):
         self.start += count
 

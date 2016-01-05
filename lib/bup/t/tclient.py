@@ -17,7 +17,7 @@ s2 = randbytes(10000)
 s3 = randbytes(10000)
 
 IDX_PAT = '/*.idx'
-    
+
 @wvtest
 def test_server_split_with_indexes():
     initial_failures = wvfailure_count()
@@ -37,7 +37,7 @@ def test_server_split_with_indexes():
     rw.new_blob(s1)
     if wvfailure_count() == initial_failures:
         subprocess.call(['rm', '-rf', tmpdir])
-    
+
 
 @wvtest
 def test_multiple_suggestions():

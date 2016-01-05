@@ -61,7 +61,7 @@ class Client:
             remote = '%s:' % is_reverse
         (self.protocol, self.host, self.port, self.dir) = parse_remote(remote)
         self.cachedir = git.repo('index-cache/%s'
-                                 % re.sub(r'[^@\w]', '_', 
+                                 % re.sub(r'[^@\w]', '_',
                                           "%s:%s" % (self.host, self.dir)))
         if is_reverse:
             self.pout = os.fdopen(3, 'rb')
@@ -136,11 +136,11 @@ class Client:
     def check_busy(self):
         if self._busy:
             raise ClientError('already busy with command %r' % self._busy)
-        
+
     def ensure_busy(self):
         if not self._busy:
             raise ClientError('expected to be busy, but not busy?!')
-        
+
     def _not_busy(self):
         self._busy = None
 
@@ -260,7 +260,7 @@ class Client:
 
     def update_ref(self, refname, newval, oldval):
         self.check_busy()
-        self.conn.write('update-ref %s\n%s\n%s\n' 
+        self.conn.write('update-ref %s\n%s\n%s\n'
                         % (refname, newval.encode('hex'),
                            (oldval or '').encode('hex')))
         self.check_ok()

@@ -29,7 +29,7 @@ if len(extra) > 1:
     o.fatal('only one target file allowed')
 if opt.bupm and opt.meta:
     o.fatal('--meta and --bupm are incompatible')
-    
+
 target = extra[0]
 
 if not re.match(r'/*[^/]+/[^/]+', target):

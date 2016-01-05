@@ -82,7 +82,7 @@ class BupRequestHandler(tornado.web.RequestHandler):
 
     def head(self, path):
         return self._process_request(path)
-    
+
     @tornado.web.asynchronous
     def _process_request(self, path):
         path = urllib.unquote(path)

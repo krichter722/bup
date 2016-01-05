@@ -50,7 +50,7 @@ def check_bloom(path, bloomfilename, idx):
     log("bloom:   checking %s\n" % ridx)
     for objsha in git.open_idx(idx):
         if not b.exists(objsha):
-            add_error("bloom: ERROR: object %s missing" 
+            add_error("bloom: ERROR: object %s missing"
                       % str(objsha).encode('hex'))
 
 
@@ -119,7 +119,7 @@ def do_bloom(path, outfilename):
     icount = 0
     for name in add:
         ix = git.open_idx(name)
-        qprogress('bloom: writing %.2f%% (%d/%d objects)\r' 
+        qprogress('bloom: writing %.2f%% (%d/%d objects)\r'
                   % (icount*100.0/add_count, icount, add_count))
         b.add_idx(ix)
         count += 1

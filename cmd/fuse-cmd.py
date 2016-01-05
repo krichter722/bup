@@ -53,15 +53,15 @@ def cache_get(top, path):
             break
     assert(c)
     return c
-        
-    
+
+
 
 class BupFs(fuse.Fuse):
     def __init__(self, top, meta=False):
         fuse.Fuse.__init__(self)
         self.top = top
         self.meta = meta
-    
+
     def getattr(self, path):
         log('--getattr(%r)\n' % path)
         try:

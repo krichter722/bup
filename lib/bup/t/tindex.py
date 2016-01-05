@@ -177,7 +177,7 @@ def index_dirty():
         e.repack()
         dump(index.merge(r2, r1, r3))
         WVPASSEQ([e.name for e in index.merge(r2, r1, r3) if not e.is_valid()],
-                 ['/a/b/c', '/a/b/', '/a/', '/'])        
+                 ['/a/b/c', '/a/b/', '/a/', '/'])
         w1.close()
         w2.close()
         w3.close()

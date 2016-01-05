@@ -55,7 +55,7 @@ def usage(msg=""):
     for cmd,synopsis in sorted(common.items()):
         log('    %-10s %s\n' % (cmd, synopsis))
     log('\n')
-    
+
     log('Other available commands:\n')
     cmds = []
     for c in sorted(os.listdir(cmdpath) + os.listdir(exepath)):
@@ -65,7 +65,7 @@ def usage(msg=""):
                 cmds.append(c[4:])
     log(columnate(cmds, '    '))
     log('\n')
-    
+
     log("See 'bup help COMMAND' for more information on " +
         "a specific command.\n")
     if msg:

@@ -300,7 +300,7 @@ top = vfs.RefList(None)
 
 if not extra:
     o.fatal('must specify at least one filename to restore')
-    
+
 exclude_rxs = parse_rx_excludes(flags, o.fatal)
 
 owner_map = {}
