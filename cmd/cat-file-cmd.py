@@ -5,8 +5,8 @@ exec "$bup_python" "$0" ${1+"$@"}
 """
 # end of bup preamble
 import sys, stat
-from bup import options, git, vfs
-from bup.helpers import *
+from bup.lib.bup import options, git, vfs
+from bup.lib.bup.helpers import *
 
 optspec = """
 bup cat-file [--meta|--bupm] /branch/revision/[path]

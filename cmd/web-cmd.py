@@ -6,8 +6,8 @@ exec "$bup_python" "$0" ${1+"$@"}
 # end of bup preamble
 import sys, stat, urllib, mimetypes, posixpath, time, webbrowser
 import urllib
-from bup import options, git, vfs
-from bup.helpers import *
+from bup.lib.bup import options, git, vfs
+from bup.lib.bup.helpers import *
 try:
     import tornado.httpserver
     import tornado.ioloop

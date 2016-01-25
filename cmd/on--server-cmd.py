@@ -5,7 +5,7 @@ exec "$bup_python" "$0" ${1+"$@"}
 """
 # end of bup preamble
 import sys, os, struct
-from bup import options, helpers
+from bup.lib.bup.lib.lib import options, helpers
 
 optspec = """
 bup on--server

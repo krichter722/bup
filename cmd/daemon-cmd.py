@@ -5,8 +5,8 @@ exec "$bup_python" "$0" ${1+"$@"}
 """
 # end of bup preamble
 import sys, getopt, socket, subprocess, fcntl
-from bup import options, path
-from bup.helpers import *
+from bup.lib.bup import options, path
+from bup.lib.bup.helpers import *
 
 optspec = """
 bup daemon [options...] -- [bup-server options...]

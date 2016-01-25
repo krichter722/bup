@@ -6,9 +6,9 @@ exec "$bup_python" "$0" ${1+"$@"}
 # end of bup preamble
 
 import sys, stat, time, os, errno, re
-from bup import metadata, options, git, index, drecurse, hlinkdb
-from bup.helpers import *
-from bup.hashsplit import GIT_MODE_TREE, GIT_MODE_FILE
+from bup.lib.bup import metadata, options, git, index, drecurse, hlinkdb
+from bup.lib.bup.helpers import *
+from bup.lib.bup.hashsplit import GIT_MODE_TREE, GIT_MODE_FILE
 
 class IterHelper:
     def __init__(self, l):

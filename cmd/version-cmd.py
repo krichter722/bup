@@ -5,8 +5,8 @@ exec "$bup_python" "$0" ${1+"$@"}
 """
 # end of bup preamble
 import sys
-from bup import options
-from bup import _version
+from bup.lib.bup import options
+from bup.lib.bup import _version
 
 optspec = """
 bup version [--date|--commit|--tag]

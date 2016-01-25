@@ -5,8 +5,8 @@ exec "$bup_python" "$0" ${1+"$@"}
 """
 # end of bup preamble
 import sys, os, random
-from bup import options
-from bup.helpers import *
+from bup.lib.bup import options
+from bup.lib.bup.helpers import *
 
 
 def randblock(n):

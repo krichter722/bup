@@ -5,8 +5,8 @@ exec "$bup_python" "$0" ${1+"$@"}
 """
 # end of bup preamble
 import sys, struct, math
-from bup import options, git, _helpers
-from bup.helpers import *
+from bup.lib.bup import options, git, _helpers
+from bup.lib.bup.helpers import *
 
 POPULATION_OF_EARTH=6.7e9  # as of September, 2010
 

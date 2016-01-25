@@ -9,8 +9,8 @@ exec "$bup_python" "$0" ${1+"$@"}
 # This code is covered under the terms of the GNU Library General
 # Public License as described in the bup LICENSE file.
 import sys, stat, errno
-from bup import metadata, options, xstat
-from bup.helpers import handle_ctrl_c, parse_timestamp, saved_errors, \
+from bup.lib.bup import metadata, options, xstat
+from bup.lib.bup.helpers import handle_ctrl_c, parse_timestamp, saved_errors, \
     add_error, log
 
 

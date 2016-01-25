@@ -5,8 +5,8 @@ exec "$bup_python" "$0" ${1+"$@"}
 """
 # end of bup preamble
 import sys, os, re
-from bup import options
-from bup import _helpers   # fixes up sys.argv on import
+from bup.lib.bup import options
+from bup.lib.bup import _helpers   # fixes up sys.argv on import
 
 optspec = """
 bup newliner

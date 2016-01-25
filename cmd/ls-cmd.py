@@ -5,8 +5,8 @@ exec "$bup_python" "$0" ${1+"$@"}
 """
 # end of bup preamble
 import sys
-from bup import git, vfs, ls
-from bup.helpers import *
+from bup.lib.bup import git, vfs, ls
+from bup.lib.bup.helpers import *
 
 
 git.check_repo_or_die()

@@ -8,8 +8,8 @@ exec "$bup_python" "$0" ${1+"$@"}
 import sys
 import os
 
-from bup import git, options
-from bup.helpers import *
+from bup.lib.bup import git, options
+from bup.lib.bup.helpers import *
 
 # FIXME: review for safe writes.
 

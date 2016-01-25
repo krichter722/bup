@@ -5,7 +5,7 @@ exec "$bup_python" "$0" ${1+"$@"}
 """
 # end of bup preamble
 import sys, os, glob
-from bup import options, path
+from bup.lib.bup import options, path
 
 optspec = """
 bup help <command>

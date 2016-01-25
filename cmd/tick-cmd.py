@@ -5,7 +5,7 @@ exec "$bup_python" "$0" ${1+"$@"}
 """
 # end of bup preamble
 import sys, time
-from bup import options
+from bup.lib.bup import options
 
 optspec = """
 bup tick

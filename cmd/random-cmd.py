@@ -5,8 +5,8 @@ exec "$bup_python" "$0" ${1+"$@"}
 """
 # end of bup preamble
 import sys
-from bup import options, _helpers
-from bup.helpers import *
+from bup.lib.bup.lib.lib import options, _helpers
+from bup.lib.bup.lib.helpers import *
 
 optspec = """
 bup random [-S seed] <numbytes>

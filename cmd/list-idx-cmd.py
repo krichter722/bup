@@ -5,8 +5,8 @@ exec "$bup_python" "$0" ${1+"$@"}
 """
 # end of bup preamble
 import sys, os
-from bup import git, options
-from bup.helpers import *
+from bup.lib.bup.lib.lib import git, options
+from bup.lib.bup.lib.helpers import *
 
 optspec = """
 bup list-idx [--find=<prefix>] <idxfilenames...>

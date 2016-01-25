@@ -8,9 +8,9 @@ import sys, stat, time, math
 from errno import EACCES
 from io import BytesIO
 
-from bup import hashsplit, git, options, index, client, metadata, hlinkdb
-from bup.helpers import *
-from bup.hashsplit import GIT_MODE_TREE, GIT_MODE_FILE, GIT_MODE_SYMLINK
+from bup.lib.bup import hashsplit, git, options, index, client, metadata, hlinkdb
+from bup.lib.bup.helpers import *
+from bup.lib.bup.hashsplit import GIT_MODE_TREE, GIT_MODE_FILE, GIT_MODE_SYMLINK
 
 
 optspec = """

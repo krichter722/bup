@@ -12,8 +12,8 @@ from time import strftime, strptime
 import sys
 import tempfile
 
-from bup import git, options, vfs
-from bup.helpers import handle_ctrl_c, log, saved_errors, unlink
+from bup.lib.bup import git, options, vfs
+from bup.lib.bup.helpers import handle_ctrl_c, log, saved_errors, unlink
 import bup.path
 
 optspec = """

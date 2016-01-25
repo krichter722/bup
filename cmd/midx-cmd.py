@@ -6,8 +6,8 @@ exec "$bup_python" "$0" ${1+"$@"}
 # end of bup preamble
 import sys, math, struct, glob, resource
 import tempfile
-from bup import options, git, midx, _helpers, xstat
-from bup.helpers import *
+from bup.lib.bup.lib.lib import options, git, midx, _helpers, xstat
+from bup.lib.bup.lib.helpers import *
 
 PAGE_SIZE=4096
 SHA_PER_PAGE=PAGE_SIZE/20.

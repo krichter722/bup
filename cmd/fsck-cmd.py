@@ -5,8 +5,8 @@ exec "$bup_python" "$0" ${1+"$@"}
 """
 # end of bup preamble
 import sys, os, glob, subprocess
-from bup import options, git
-from bup.helpers import *
+from bup.lib.bup import options, git
+from bup.lib.bup.helpers import *
 
 par2_ok = 0
 nullf = open('/dev/null')

@@ -5,9 +5,9 @@ exec "$bup_python" "$0" ${1+"$@"}
 """
 # end of bup preamble
 import copy, errno, sys, stat, re
-from bup import options, git, metadata, vfs
-from bup.helpers import *
-from bup._helpers import write_sparsely
+from bup.lib.bup import options, git, metadata, vfs
+from bup.lib.bup.helpers import *
+from bup.lib.bup._helpers import write_sparsely
 
 optspec = """
 bup restore [-C outdir] </branch/revision/path/to/dir ...>

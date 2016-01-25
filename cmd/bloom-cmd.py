@@ -5,8 +5,8 @@ exec "$bup_python" "$0" ${1+"$@"}
 """
 # end of bup preamble
 import sys, glob, tempfile
-from bup import options, git, bloom
-from bup.helpers import *
+from bup.lib.bup import options, git, bloom
+from bup.lib.bup.helpers import *
 
 optspec = """
 bup bloom [options...]

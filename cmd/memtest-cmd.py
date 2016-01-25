@@ -5,8 +5,8 @@ exec "$bup_python" "$0" ${1+"$@"}
 """
 # end of bup preamble
 import sys, re, struct, time, resource
-from bup import git, bloom, midx, options, _helpers
-from bup.helpers import *
+from bup.lib.bup import git, bloom, midx, options, _helpers
+from bup.lib.bup.helpers import *
 
 handle_ctrl_c()
 

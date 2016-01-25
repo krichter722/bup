@@ -13,9 +13,9 @@ exec "$bup_python" "$0" ${1+"$@"}
 # TODO: Add tar-like -C option.
 
 import sys
-from bup import metadata
-from bup import options
-from bup.helpers import handle_ctrl_c, log, saved_errors
+from bup.lib.bup import metadata
+from bup.lib.bup import options
+from bup.lib.bup.helpers import handle_ctrl_c, log, saved_errors
 
 
 def open_input(name):

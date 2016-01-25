@@ -5,8 +5,8 @@ exec "$bup_python" "$0" ${1+"$@"}
 """
 # end of bup preamble
 import sys, os, errno
-from bup import options, git, vfs, xstat
-from bup.helpers import *
+from bup.lib.bup import options, git, vfs, xstat
+from bup.lib.bup.helpers import *
 try:
     import fuse
 except ImportError:

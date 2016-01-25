@@ -5,8 +5,8 @@ exec "$bup_python" "$0" ${1+"$@"}
 """
 # end of bup preamble
 import os, sys, struct
-from bup import options, git
-from bup.helpers import *
+from bup.lib.bup import options, git
+from bup.lib.bup.helpers import *
 
 suspended_w = None
 dumb_server_mode = False

@@ -6,8 +6,8 @@ exec "$bup_python" "$0" ${1+"$@"}
 # end of bup preamble
 import sys, os, struct, getopt, subprocess, signal
 from subprocess import PIPE
-from bup import options, ssh, path
-from bup.helpers import *
+from bup.lib.bup import options, ssh, path
+from bup.lib.bup.helpers import *
 
 optspec = """
 bup on <hostname> index ...
