@@ -9,7 +9,7 @@ import glob, os, sys, tempfile
 
 from bup import options, git, bloom
 from bup.helpers import (debug1, handle_ctrl_c, log, progress, qprogress,
-                         saved_errors)
+                         saved_errors, add_error)
 
 optspec = """
 bup bloom [options...]

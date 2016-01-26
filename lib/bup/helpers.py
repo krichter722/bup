@@ -5,7 +5,7 @@ from ctypes import sizeof, c_void_p
 from os import environ
 from contextlib import contextmanager
 import sys, os, pwd, subprocess, errno, socket, select, mmap, stat, re, struct
-import hashlib, heapq, math, operator, time, grp, tempfile
+import hashlib, math, time, grp, tempfile, threading, Queue
 
 from bup import _helpers
 
@@ -157,36 +157,6 @@ def _fallback_next(it, default=_unspecified_next_default):
 
 if sys.version_info < (2, 6):
     next =  _fallback_next
-
-
-def merge_iter(iters, pfreq, pfunc, pfinal, key=None):
-    if key:
-        samekey = lambda e, pe: getattr(e, key) == getattr(pe, key, None)
-    else:
-        samekey = operator.eq
-    count = 0
-    total = sum(len(it) for it in iters)
-    iters = (iter(it) for it in iters)
-    heap = ((next(it, None),it) for it in iters)
-    heap = [(e,it) for e,it in heap if e]
-
-    heapq.heapify(heap)
-    pe = None
-    while heap:
-        if not count % pfreq:
-            pfunc(count, total)
-        e, it = heap[0]
-        if not samekey(e, pe):
-            pe = e
-            yield e
-        count += 1
-        try:
-            e = it.next() # Don't use next() function, it's too expensive
-        except StopIteration:
-            heapq.heappop(heap) # remove current
-        else:
-            heapq.heapreplace(heap, (e, it)) # shift current to new location
-    pfinal(count, total)
 
 
 def unlink(f):
