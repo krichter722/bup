@@ -58,7 +58,6 @@ else:
         pm = _helpers.bitmatch(last, i)
         longmatch = max(longmatch, pm)
         last = i
-    print longmatch
     log('%d matching prefix bits\n' % longmatch)
     doublings = math.log(len(mi), 2)
     bpd = longmatch / doublings

@@ -1,5 +1,5 @@
 
-import errno, os, re, struct, time, zlib
+import errno, os, re, struct, time, zlib, sys
 
 from bup import git, ssh
 from bup.helpers import (Conn, atomically_replaced_file, chunkyreader, debug1,

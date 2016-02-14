@@ -1,9 +1,14 @@
-import errno, metadata, os, stat, struct, tempfile
+import errno, metadata, os, stat, struct, tempfile, operator, logging, threading, Queue, heapq
 
 from bup import xstat
-from bup.helpers import (add_error, log, merge_iter, mmap_readwrite,
+from bup.helpers import (add_error, log, mmap_readwrite,
                          progress, qprogress, resolve_parent, slashappend)
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+logger_stdout_handler = logging.StreamHandler()
+logger_stdout_handler.setLevel(logging.DEBUG)
+logger.addHandler(logger_stdout_handler)
 
 EMPTY_SHA = '\0'*20
 FAKE_SHA = '\x01'*20
@@ -31,7 +36,7 @@ class Error(Exception):
     pass
 
 
-class MetaStoreReader:
+class MetaStoreReader(object):
     def __init__(self, filename):
         self._file = None
         self._file = open(filename, 'rb')
@@ -49,7 +54,7 @@ class MetaStoreReader:
         return metadata.Metadata.read(self._file)
 
 
-class MetaStoreWriter:
+class MetaStoreWriter(object):
     # For now, we just append to the file, and try to handle any
     # truncation or corruption somewhat sensibly.
 
@@ -99,7 +104,7 @@ class MetaStoreWriter:
         return ofs
 
 
-class Level:
+class Level(object):
     def __init__(self, ename, parent):
         self.parent = parent
         self.ename = ename
@@ -146,14 +151,28 @@ def _golevel(level, f, ename, newentry, metastore, tmax):
     return level
 
 
-class Entry:
+class Entry(object):
     def __init__(self, basename, name, meta_ofs, tmax):
         self.basename = str(basename)
         self.name = str(name)
+        if type(meta_ofs) != int:
+            raise ValueError("meta_ofs has to be of type 'int'")
         self.meta_ofs = meta_ofs
         self.tmax = tmax
+        # properties need to be initialized as ints in order to make __repr__
+        # work after creation
         self.children_ofs = 0
         self.children_n = 0
+        self.flags = 0
+        self.ctime = 0
+        self.mtime = 0
+        self.atime = 0
+        self.dev = 0
+        self.ino = 0
+        self.nlink = 0
+        self.size = 0
+        self.mode = None
+        self.gitmode = None
 
     def __repr__(self):
         return ("(%s,0x%04x,%d,%d,%d,%d,%d,%d,%s/%s,0x%04x,%d,0x%08x/%d)"
@@ -281,7 +300,7 @@ class BlankNewEntry(NewEntry):
 
 class ExistingEntry(Entry):
     def __init__(self, parent, basename, name, m, ofs):
-        Entry.__init__(self, basename, name, None, None)
+        Entry.__init__(self, basename, name, meta_ofs=0, tmax=None)
         self.parent = parent
         self._m = m
         self._ofs = ofs
@@ -347,7 +366,7 @@ class ExistingEntry(Entry):
         return self.iter()
             
 
-class Reader:
+class Reader(object):
     def __init__(self, filename):
         self.filename = filename
         self.m = ''
@@ -439,7 +458,7 @@ def pathsplit(p):
     return l
 
 
-class Writer:
+class Writer(object):
     def __init__(self, filename, metastore, tmax):
         self.rootlevel = self.level = Level([], None)
         self.f = None
@@ -560,3 +579,81 @@ def merge(*iters):
     def pfinal(count, total):
         progress('bup: merging indexes (%d/%d), done.\n' % (count, total))
     return merge_iter(iters, 1024, pfunc, pfinal, key='name')
+
+
+def merge_iter(iters, pfreq, pfunc, pfinal, key=None):
+    """merges a list of collections `iters`.
+
+    Calls the function `pfunc` at every `pfreq`th
+    item of the collections and finally prints `pfinal`. This can be used to
+    print progress messages to the terminal.
+
+    If key is `None` `operator.eq` is used for comparison, otherwise a `lambda`
+    expression comparing the iterators elements based on the return value of
+    `getattr(element, key)`."""
+    if key:
+        samekey = lambda e, pe: getattr(e, key) == getattr(pe, key, None)
+    else:
+        samekey = operator.eq
+    count = 0
+    total = sum(len(it) for it in iters)
+    iters = [iter(it) for it in iters]
+    logger.debug("merging %d iters" % (len(iters),))
+
+    pe = None # the previously yielded element
+    e_queue = Queue.PriorityQueue() # the queue to put the heap's head in for
+        # comparison while the it heaps iter's next elements can be determined
+        # asynchronously
+    threads = set([])
+    # define thread as class in order to allow it to remove itself from threads
+    # list after it completed
+    class MyThread(threading.Thread):
+        def __init__(self, it):
+            super(MyThread, self).__init__() # seems to be necessary if self is
+                # used in run
+            self.it = it
+            self.count = 0
+        def run(self):
+            while True:
+                try:
+                    e = self.it.next()
+                    if e:
+                        # skip None entries
+                        e_queue.put(item=(e, self))
+                        self.count += 1
+                except StopIteration:
+                    logger.debug("iterator %s processed %d elements in thread, removing from list" % (str(it), self.count))
+                    threads.remove(self)
+                    break
+    # create and start threads
+    for it in iters:
+        thread = MyThread(it)
+        logger.debug("starting thread for iterator %s" % (str(it),))
+        threads.add(thread) # needs to be called before start because it might finish
+            # so quickly that the thread.remove statements fails
+        thread.start()
+    buf = [] # buffer to poll minimal elements from (filled by multiple threads until all threads have added an element)
+    thread_seen = set([])
+    while len(threads) > 0:
+        if not count % pfreq:
+            pfunc(count, total)
+        while thread_seen != threads: # make sure that `threads` and `thread_seen` are of the same type
+            # as long as not every thread has produced a result store in `buf`...
+            e, thread = e_queue.get(block=True, timeout=None # there's no need to specify `timeout` because all threads are putting elements in `e_queue` so `buf` shouldn't get too large
+                )
+            buf.append(e)
+            thread_seen.add(thread)
+        # ...then `heapify` `buf`, check `samekey` and eventually `yield`
+        thread_seen.clear()
+        heapq.heapify(buf)
+        while buf:
+            e = heapq.heappop(buf)
+            if not samekey(e, pe):
+                pe = e
+                yield e
+            count += 1
+        # buf is emptied with heapq.heappop
+    pfinal(count, total)
+# internal implementation notes:
+# - `heapq.merge(iterables*)` can't be used because it doesn't allow specification of sorting order (reverse or not)
+# - creation of `heapq` heaps isn't possible with explicit sorting order (reverse or not) -> requires wrapper element class which overwrites `__cmp__` and alters order, e.g. alternates order for reverse sorting

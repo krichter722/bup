@@ -7,12 +7,13 @@ import errno, os, sys, zlib, time, subprocess, struct, stat, re, tempfile, glob
 from collections import namedtuple
 from itertools import islice
 
-from bup import _helpers, path, midx, bloom, xstat
+from bup import _helpers, path, midx, bloom, xstat, index
 from bup.helpers import (Sha1, add_error, chunkyreader, debug1, debug2,
                          fdatasync,
-                         hostname, log, merge_iter, mmap_read, mmap_readwrite,
+                         hostname, log, mmap_read, mmap_readwrite,
                          progress, qprogress, unlink, username, userfullname,
                          utc_offset_str)
+from bup.index import merge_iter
 
 
 max_pack_size = 1000*1000*1000  # larger packs will slow down pruning
