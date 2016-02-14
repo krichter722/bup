@@ -1,0 +1,6 @@
+#!/bin/bash
+
+set -euxo pipefail
+
+brew update
+brew install pandoc par2
