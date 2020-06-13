@@ -1,0 +1,31 @@
+ubuntu-16.04:
+  image: ubuntu:16.04
+  script:
+    - sed -i '/^#\sdeb-src /s/^#//' "/etc/apt/sources.list"
+    - apt-get update && apt-get build-dep --yes bup
+    - ./configure && make -j && make -j check && make install
+
+ubuntu-18.04:
+  image: ubuntu:18.04
+  script:
+    - sed -i '/^#\sdeb-src /s/^#//' "/etc/apt/sources.list"
+    - apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get build-dep --yes bup
+    - ./configure && make -j && make -j check && make install
+
+ubuntu-20.04:
+  image: ubuntu:20.04
+  script:
+    - apt-get update && apt-get install --yes build-essential git rsync python-dev python3-fuse python3-pyxattr python3-pylibacl linux-libc-dev acl attr python3-tornado python-pyxattr-doc python-pylibacl-doc
+    - ./configure && make -j && make -j check && make install
+
+ubuntu-rolling:
+  image: ubuntu:rolling
+  script:
+    - apt-get update && apt-get install --yes build-essential git rsync python-dev python3-fuse python3-pyxattr python3-pylibacl linux-libc-dev acl attr python3-tornado python-pyxattr-doc python-pylibacl-doc
+    - ./configure && make -j && make -j check && make install
+
+ubuntu-20.10:
+  image: ubuntu:20.10
+  script:
+    - apt-get update && apt-get install --yes build-essential git rsync python-dev python3-fuse python3-pyxattr python3-pylibacl linux-libc-dev acl attr python3-tornado python-pyxattr-doc python-pylibacl-doc
+    - ./configure && make -j && make -j check && make install
