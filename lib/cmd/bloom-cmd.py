@@ -16,6 +16,8 @@ exec "$bup_python" "$0"
 
 from __future__ import absolute_import
 import glob, os, sys, tempfile
+import threading
+import concurrent.futures.ThreadPoolExecutor as ThreadPoolExecutor
 
 sys.path[:0] = [os.path.dirname(os.path.realpath(__file__)) + '/..']
 
@@ -84,45 +86,49 @@ def do_bloom(path, outfilename, k):
 
     add = []
     rest = []
-    add_count = 0
-    rest_count = 0
-    for i, name in enumerate(glob.glob(b'%s/*.idx' % path)):
-        progress('bloom: counting: %d\r' % i)
+    add_count = AtomicInteger()
+    rest_count = AtomicInteger()
+
+    def __bloom_enumerate__(i, name):
         ix = git.open_idx(name)
         ixbase = os.path.basename(name)
         if b and (ixbase in b.idxnames):
             rest.append(name)
-            rest_count += len(ix)
+            rest_count.inc(len(ix))
         else:
             add.append(name)
-            add_count += len(ix)
+            add_count.inc(len(ix))
+
+    with ThreadPoolExecutor(max_workers=16) as executor:
+        for i, name in enumerate(glob.glob(b'%s/*.idx' % path)):
+            executor.submit(__bloom_enumerate__, i, name)
 
     if not add:
         debug1("bloom: nothing to do.\n")
         return
 
     if b:
-        if len(b) != rest_count:
+        if len(b) != rest_count.value:
             debug1("bloom: size %d != idx total %d, regenerating\n"
-                   % (len(b), rest_count))
+                   % (len(b), rest_count.value))
             b = None
         elif k is not None and k != b.k:
             debug1("bloom: new k %d != existing k %d, regenerating\n"
                    % (k, b.k))
             b = None
         elif (b.bits < bloom.MAX_BLOOM_BITS[b.k] and
-              b.pfalse_positive(add_count) > bloom.MAX_PFALSE_POSITIVE):
+              b.pfalse_positive(add_count.value) > bloom.MAX_PFALSE_POSITIVE):
             debug1("bloom: regenerating: adding %d entries gives "
                    "%.2f%% false positives.\n"
-                   % (add_count, b.pfalse_positive(add_count)))
+                   % (add_count.value, b.pfalse_positive(add_count.value)))
             b = None
         else:
-            b = bloom.ShaBloom(outfilename, readwrite=True, expected=add_count)
+            b = bloom.ShaBloom(outfilename, readwrite=True, expected=add_count.value)
     if not b: # Need all idxs to build from scratch
         add += rest
-        add_count += rest_count
-    del rest
-    del rest_count
+        add_count.inc(rest_count.value)
+    #del rest
+    #del rest_count
 
     msg = b is None and 'creating from' or 'adding'
     if not _first: _first = path
@@ -130,18 +136,18 @@ def do_bloom(path, outfilename, k):
     progress('bloom: %s%s %d file%s (%d object%s).\r'
         % (path_msg(dirprefix), msg,
            len(add), len(add)!=1 and 's' or '',
-           add_count, add_count!=1 and 's' or ''))
+           add_count.value, add_count.value != 1 and 's' or ''))
 
     tfname = None
     if b is None:
         tfname = os.path.join(path, b'bup.tmp.bloom')
-        b = bloom.create(tfname, expected=add_count, k=k)
+        b = bloom.create(tfname, expected=add_count.value, k=k)
     count = 0
     icount = 0
     for name in add:
         ix = git.open_idx(name)
         qprogress('bloom: writing %.2f%% (%d/%d objects)\r' 
-                  % (icount*100.0/add_count, icount, add_count))
+                  % (icount*100.0/add_count.value, icount, add_count.value))
         b.add_idx(ix)
         count += 1
         icount += len(ix)
@@ -152,6 +158,34 @@ def do_bloom(path, outfilename, k):
 
     if tfname:
         os.rename(tfname, outfilename)
+
+
+class AtomicInteger():
+    def __init__(self, value=0):
+        self._value = value
+        self._lock = threading.Lock()
+
+    def inc(self, value=1):
+        with self._lock:
+            self._value += value
+            return self._value
+
+    def dec(self, value=1):
+        with self._lock:
+            self._value -= value
+            return self._value
+
+
+    @property
+    def value(self):
+        with self._lock:
+            return self._value
+
+    @value.setter
+    def value(self, v):
+        with self._lock:
+            self._value = v
+            return self._value
 
 
 handle_ctrl_c()
